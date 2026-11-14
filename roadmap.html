@@ -604,7 +604,96 @@ textarea{width:100%;min-height:90px;resize:vertical;background:var(--surface2);c
 .ph-here{display:grid;gap:3px;margin-top:6px}
 .ph-here em{font-style:normal;font-size:.7rem;font-weight:700;color:var(--accent)}
 
+@media (max-width:760px){
+  .pace-row{grid-template-columns:minmax(0,1fr) auto auto;row-gap:6px}
+  .pc-bullet{grid-column:1/-1;order:3}
+}
+/* Progress tab */
+.pfilters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:-4px 0 12px}
+.ptiles{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.tile.good .v{color:var(--s-done)}
+.ptiles .tile .s{white-space:normal}
+.pace-row .tp-name{white-space:normal;line-height:1.3}
+.pchart{width:100%;min-height:200px}
+.pc-svg{display:block;overflow:visible;font-family:inherit}
+.pc-svg:focus-visible{outline:3px solid var(--accent);outline-offset:4px;border-radius:6px}
+.pc-grid{stroke:var(--border);stroke-width:1}
+.pc-grid.base{stroke:var(--line)}
+.pc-ax{fill:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.pc-lab{fill:var(--muted);font-size:11.5px;font-weight:600}
+.pc-lab.strong{fill:var(--text)}
+.pc-today{stroke:#d14343;stroke-width:1;opacity:.7}
+.pc-line{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pc-line.plan{stroke:var(--muted);stroke-dasharray:5 4}
+.pc-line.done{stroke:var(--accent)}
+.pc-wash{fill:var(--accent);opacity:.1}
+.pc-dot{stroke:var(--surface);stroke-width:2}
+.pc-dot.done{fill:var(--accent)}
+.pc-dot.plan{fill:var(--muted)}
+.pc-xline{stroke:var(--muted);stroke-width:1}
+.pc-hit{fill:transparent;cursor:crosshair}
+.pc-hit.col{cursor:default;outline:none}
+.pc-hit.col.on,.pc-hit.col:focus-visible{fill:color-mix(in srgb,var(--text) 6%,transparent)}
+.pc-hit.col:focus-visible{stroke:var(--accent);stroke-width:2}
+.plegend{display:flex;flex-wrap:wrap;gap:4px 14px;margin:-2px 0 8px;font-size:.78rem;color:var(--muted)}
+.lg-i{display:inline-flex;align-items:center;gap:6px}
+.lk{display:inline-block;width:16px;border-top:2px solid var(--kc)}
+.lk.dash{border-top-style:dashed}
+.sk{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--kc)}
+.pnote{margin:8px 0 0}
+.tview{margin-top:8px;font-size:.82rem}
+.tview summary{cursor:pointer;color:var(--accent);width:max-content}
+.tview summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.tv-wrap{overflow-x:auto;margin-top:6px}
+.ptable{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+.ptable th,.ptable td{text-align:right;padding:4px 8px;border-bottom:1px solid var(--border);white-space:nowrap}
+.ptable th:first-child,.ptable thead th:first-child{text-align:left}
+.ptable thead th{color:var(--muted);font-weight:600}
+.ptable tbody th{font-weight:400}
+.prow{margin-top:14px}
+.prow.even{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.prow+.panel,.prow+.prow{margin-top:14px}
+.pace{display:grid;gap:2px}
+.pace-row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(60px,1fr) 52px 86px;gap:10px;align-items:center;background:none;border:0;border-radius:8px;padding:7px 6px;margin:0 -6px;cursor:pointer;text-align:left;font-size:.84rem}
+.pace-row:hover{background:var(--surface2)}
+.pace-row:focus-visible,.clp-row:focus-visible,.rec-b:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.pc-bullet{position:relative;height:10px;border-radius:99px;background:var(--surface2)}
+.pb-fill{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:var(--tc)}
+.pb-mark{position:absolute;top:-4px;bottom:-4px;width:2px;border-radius:2px;background:var(--text)}
+.pace-n{text-align:right;color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums}
+.pace-st{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;white-space:nowrap}
+.pace-st i{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.pace-st.behind i{background:#d14343}
+.pace-st.ahead i{background:var(--s-done)}
+.pace-st.even i{background:var(--s-todo)}
+.cl-prog{display:grid;gap:2px}
+.clp-row{display:grid;grid-template-columns:minmax(0,1fr) 70px 46px;gap:8px;align-items:center;background:none;border:0;border-radius:8px;padding:6px;margin:0 -6px;cursor:pointer;text-align:left;font-size:.84rem}
+.clp-row:hover{background:var(--surface2)}
+.clp-t{display:flex;align-items:center;gap:7px;min-width:0}
+.clp-t>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clp-t i{width:8px;height:8px;border-radius:50%;background:var(--tc);flex:0 0 auto}
+.cl-prog+.linkbtn{margin:8px 0 0}
+.rec{list-style:none;margin:0;padding:0}
+.rec li{display:grid;grid-template-columns:56px minmax(0,1fr);gap:8px;align-items:center;border-bottom:1px solid var(--border)}
+.rec li:last-child{border-bottom:0}
+.rec-d{font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.rec-b{display:grid;gap:1px;background:none;border:0;padding:7px 4px;cursor:pointer;text-align:left;min-width:0;border-radius:6px}
+.rec-b:hover .rec-w{color:var(--accent)}
+.rec-w{font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-k{font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.rec-m{display:flex;align-items:center;gap:6px;font-size:.74rem;color:var(--muted);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-m i{width:7px;height:7px;border-radius:50%;background:var(--tc);flex:0 0 auto}
+#ptip{position:fixed;z-index:90;pointer-events:none;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);padding:8px 10px;font-size:.8rem;min-width:140px;max-width:260px}
+#ptip[hidden]{display:none}
+.pt-t{font-size:.74rem;color:var(--muted);margin-bottom:4px}
+.pt-r{display:flex;align-items:center;gap:7px;line-height:1.5}
+.pt-r b{font-variant-numeric:tabular-nums}
+.pt-r span{color:var(--muted)}
+.pt-k{display:inline-block;width:12px;border-top:2px solid var(--kc);flex:0 0 auto}
+.pt-k.dash{border-top-style:dashed}
+
 @media (max-width:900px){
+  .prow.even{grid-template-columns:1fr}
   .dash{grid-template-columns:1fr}
   .dash-side{position:static}
   .ov-row{grid-template-columns:1fr}
@@ -5163,8 +5252,8 @@ function renderLegend(){
 }
 function renderTabs(){
   const nav=$('#tabs'); nav.replaceChildren();
-  const ICON={week:'M4 7h16M4 12h16M4 17h10',cal:'M5 6h14v13H5zM5 10h14M9 4v4M15 4v4',all:'M4 6h4v4H4zM10 8h10M4 14h4v4H4zM10 16h10'};
-  const views=[{id:'week',name:'This week'},{id:'cal',name:'Calendar'},{id:'all',name:'Overview'}];
+  const ICON={week:'M4 7h16M4 12h16M4 17h10',cal:'M5 6h14v13H5zM5 10h14M9 4v4M15 4v4',all:'M4 6h4v4H4zM10 8h10M4 14h4v4H4zM10 16h10',prog:'M4 19V5M4 19h16M8 15l4-4 3 3 5-6'};
+  const views=[{id:'week',name:'This week'},{id:'cal',name:'Calendar'},{id:'all',name:'Overview'},{id:'prog',name:'Progress'}];
   views.forEach(function(t){
     const ic=document.createElementNS('http://www.w3.org/2000/svg','svg'); ic.setAttribute('viewBox','0 0 24 24'); ic.setAttribute('aria-hidden','true'); ic.setAttribute('class','tico');
     const pth=document.createElementNS('http://www.w3.org/2000/svg','path'); pth.setAttribute('d',ICON[t.id]); ic.append(pth);
@@ -5625,11 +5714,349 @@ function renderView(){
   if(currentTab==='week') renderWeek();
   else if(currentTab==='all') renderAllView();
   else if(currentTab==='cal') renderCalendar();
+  else if(currentTab==='prog') renderProgress();
   else{
     const t=TRACKS.find(function(x){return x.id===currentTab;})||TRACKS[0];
     if(t){currentTab=t.id; renderTrack(t);}
   }
 }
+
+/* =====================================================================
+   PROGRESS DASHBOARD (tab "prog")
+   Everything is computed from state (status, doneAt, checks, sched) and the
+   step dates; nothing here writes data. Charts are drawn after the panels are
+   in the page, because they size themselves to their box.
+   ===================================================================== */
+const SVGNS='http://www.w3.org/2000/svg';
+const PROG_RANGES=[{w:4,label:'4 weeks'},{w:12,label:'12 weeks'},{w:26,label:'6 months'}];
+function sv(tag,attrs){const e=document.createElementNS(SVGNS,tag);Object.keys(attrs||{}).forEach(function(k){e.setAttribute(k,attrs[k]);});return e;}
+function progWeeks(){const w=Number(viewOpts.progWeeks);return PROG_RANGES.some(function(r){return r.w===w;})?w:12;}
+// The day a step was finished: the date it was marked done, or for a checklist
+// step that finished by its ticks, the date of its last tick.
+function doneDate(n){
+  if(getStatus(n.id)!=='done') return null;
+  if(state.doneAt[n.id]) return state.doneAt[n.id];
+  let last=null;
+  (n.checklist||[]).forEach(function(it){const d=state.checks[ckey(n.id,it.id)];if(typeof d==='string'&&(!last||d>last)) last=d;});
+  return last;
+}
+// Things done, by kind and day: checklist ticks, finished steps, study minutes (done sessions).
+function progEvents(){
+  const ev={ticks:{},steps:{},mins:{},minsByTrack:{}};
+  const inc=function(o,d,n){o[d]=(o[d]||0)+(n||1);};
+  Object.keys(state.checks).forEach(function(k){const d=state.checks[k];if(typeof d==='string'&&INDEX[k.split('::')[0]]) inc(ev.ticks,d);});
+  allNodes().forEach(function(n){const d=doneDate(n);if(d) inc(ev.steps,d);});
+  schedAll().forEach(function(b){
+    const t=blockTrack(b), tid=t?t.id:'_other';
+    Object.keys(b.done||{}).forEach(function(d){
+      if(!b.done[d]) return;
+      inc(ev.mins,d,b.mins);
+      (ev.minsByTrack[d]=ev.minsByTrack[d]||{}); inc(ev.minsByTrack[d],tid,b.mins);
+    });
+  });
+  return ev;
+}
+function sumDays(o,from,to){let s=0;Object.keys(o).forEach(function(d){if(d>=from&&d<=to) s+=o[d];});return s;}
+function bestStreak(m){
+  const days=Object.keys(m).filter(function(d){return m[d];}).sort(); let best=0,run=0,prev=null;
+  days.forEach(function(d){run=(prev&&addDays(prev,1)===d)?run+1:1;best=Math.max(best,run);prev=d;});
+  return best;
+}
+function niceStep(raw){const p=Math.pow(10,Math.floor(Math.log10(Math.max(raw,1e-9))));const f=raw/p;return (f<=1?1:f<=2?2:f<=5?5:10)*p;}
+function yTicks(max,count){const st=Math.max(1,niceStep(max/(count||4)));const top=Math.max(st,Math.ceil(max/st)*st);const t=[];for(let v=0;v<=top+1e-9;v+=st)t.push(v);return t;}
+function fmtNum(v){return Number.isInteger(v)?v.toLocaleString('en-GB'):v.toLocaleString('en-GB',{maximumFractionDigits:1});}
+function fmtHours(mins){const hrs=mins/60;return (hrs<10?Math.round(hrs*10)/10:Math.round(hrs)).toLocaleString('en-GB')+' h';}
+
+/* tooltip: one floating box, used by every chart on this tab */
+let ptip=null;
+function tipShow(e,title,rows){
+  if(!ptip){ptip=h('div',{id:'ptip',role:'tooltip'});document.body.append(ptip);}
+  ptip.replaceChildren(h('div',{class:'pt-t',text:title}));
+  rows.forEach(function(r){
+    const k=r.c?h('i',{class:'pt-k'+(r.dash?' dash':'')}):null; if(k) k.style.setProperty('--kc',r.c);
+    ptip.append(h('div',{class:'pt-r'},k,h('b',{text:r.v}),h('span',{text:r.k})));
+  });
+  ptip.hidden=false;
+  let x=e&&e.clientX, y=e&&e.clientY;
+  if(x==null||e.type==='focus'||e.type==='keydown'){const r=(e.anchor||e.currentTarget||e.target).getBoundingClientRect();x=r.left+r.width/2;y=r.top;}
+  const tw=ptip.offsetWidth, th=ptip.offsetHeight;
+  let L=x+14, T=y-th-10;
+  if(L+tw>window.innerWidth-8) L=x-tw-14;
+  if(L<8) L=8; if(T<8) T=y+18;
+  ptip.style.left=L+'px'; ptip.style.top=T+'px';
+}
+function tipHide(){if(ptip) ptip.hidden=true;}
+
+function dataTable(head,rows){
+  const t=h('table',{class:'ptable'});
+  t.append(h('thead',{},h('tr',{},head.map(function(c){return h('th',{scope:'col',text:c});}))));
+  const tb=h('tbody',{}); rows.forEach(function(r){tb.append(h('tr',{},r.map(function(c,i){return i?h('td',{text:String(c)}):h('th',{scope:'row',text:String(c)});})));});
+  t.append(tb);
+  return h('details',{class:'tview'},h('summary',{text:'Show as table'}),h('div',{class:'tv-wrap'},t));
+}
+function lineKey(label,color,dash){const i=h('i',{class:'lk'+(dash?' dash':'')});i.style.setProperty('--kc',color);return h('span',{class:'lg-i'},i,label);}
+function swatchKey(label,color){const i=h('i',{class:'sk'});i.style.setProperty('--kc',color);return h('span',{class:'lg-i'},i,label);}
+
+/* ---- chart 1: planned vs done over time (burn-up) ---- */
+function burnupData(weeks){
+  const t0=todayISO(), start=addDays(t0,-7*weeks), end=addDays(t0,Math.max(7,Math.round(7*weeks/3)));
+  const plan=[], done=[];
+  allNodes().forEach(function(n){ if(getStatus(n.id)==='skipped') return; if(n.date) plan.push(n.date); const d=doneDate(n); if(d) done.push(d); });
+  plan.sort(); done.sort();
+  const days=[]; let pi=0, di=0;
+  for(let d=start; d<=end; d=addDays(d,1)){
+    while(pi<plan.length&&plan[pi]<=d) pi++;
+    while(di<done.length&&done[di]<=d) di++;
+    days.push({d:d,plan:pi,done:d<=t0?di:null});
+  }
+  return {days:days,t0:t0,total:plan.length};
+}
+function drawBurnup(host,weeks){
+  const D=burnupData(weeks), days=D.days, W=Math.max(280,host.clientWidth), H=240;
+  const m={l:34,r:64,t:14,b:26}, pw=W-m.l-m.r, ph=H-m.t-m.b;
+  const ymax=Math.max(1,days[days.length-1].plan,days.reduce(function(a,x){return Math.max(a,x.done||0);},0));
+  const ticks=yTicks(ymax,4), top=ticks[ticks.length-1];
+  const X=function(i){return m.l+i/(days.length-1)*pw;}, Y=function(v){return m.t+ph-v/top*ph;};
+  const svg=sv('svg',{width:W,height:H,viewBox:'0 0 '+W+' '+H,class:'pc-svg',role:'img','aria-label':'Steps planned and done over time'});
+  ticks.forEach(function(v){
+    svg.append(sv('line',{x1:m.l,x2:m.l+pw,y1:Y(v),y2:Y(v),class:'pc-grid'}));
+    const tx=sv('text',{x:m.l-6,y:Y(v)+4,class:'pc-ax','text-anchor':'end'}); tx.textContent=fmtNum(v); svg.append(tx);
+  });
+  const nx=Math.max(2,Math.min(6,Math.floor(pw/90)));
+  for(let k=0;k<nx;k++){
+    const i=Math.round(k*(days.length-1)/(nx-1));
+    const tx=sv('text',{x:X(i),y:H-8,class:'pc-ax','text-anchor':k===0?'start':k===nx-1?'end':'middle'}); tx.textContent=fmtDM(days[i].d); svg.append(tx);
+  }
+  const ti=days.findIndex(function(x){return x.d===D.t0;});
+  svg.append(sv('line',{x1:X(ti),x2:X(ti),y1:m.t,y2:m.t+ph,class:'pc-today'}));
+  const tl=sv('text',{x:X(ti)+4,y:m.t+10,class:'pc-ax'}); tl.textContent='Today'; svg.append(tl);
+  const path=function(key){let p='';days.forEach(function(x,i){if(x[key]==null)return;p+=(p?'L':'M')+X(i).toFixed(1)+' '+Y(x[key]).toFixed(1);});return p;};
+  const dp=path('done');
+  svg.append(sv('path',{d:dp+'L'+X(ti).toFixed(1)+' '+Y(0)+'L'+X(0)+' '+Y(0)+'Z',class:'pc-wash'}));
+  svg.append(sv('path',{d:path('plan'),class:'pc-line plan'}));
+  svg.append(sv('path',{d:dp,class:'pc-line done'}));
+  svg.append(sv('circle',{cx:X(ti),cy:Y(days[ti].done),r:4,class:'pc-dot done'}));
+  const last=days[days.length-1];
+  const pl=sv('text',{x:m.l+pw+6,y:Y(last.plan)+4,class:'pc-lab'}); pl.textContent='Planned '+last.plan; svg.append(pl);
+  const dl=sv('text',{x:X(ti)+8,y:Y(days[ti].done)-8,class:'pc-lab strong'}); dl.textContent='Done '+days[ti].done; svg.append(dl);
+  // crosshair
+  const cross=sv('g',{class:'pc-cross'}); cross.style.display='none';
+  const cl=sv('line',{y1:m.t,y2:m.t+ph,class:'pc-xline'}), c1=sv('circle',{r:4,class:'pc-dot plan'}), c2=sv('circle',{r:4,class:'pc-dot done'});
+  cross.append(cl,c1,c2); svg.append(cross);
+  let cur=ti;
+  const show=function(i,e){
+    i=Math.max(0,Math.min(days.length-1,i)); cur=i; const x=days[i];
+    cross.style.display=''; cl.setAttribute('x1',X(i)); cl.setAttribute('x2',X(i));
+    c1.setAttribute('cx',X(i)); c1.setAttribute('cy',Y(x.plan));
+    if(x.done!=null){c2.style.display='';c2.setAttribute('cx',X(i));c2.setAttribute('cy',Y(x.done));} else c2.style.display='none';
+    const rows=[{v:String(x.plan),k:'planned by then',c:'var(--muted)',dash:true}];
+    if(x.done!=null){rows.push({v:String(x.done),k:'done',c:'var(--accent)'});const g=x.done-x.plan;rows.push({v:(g>0?'+':'')+g,k:g<0?'behind plan':g>0?'ahead of plan':'on plan'});}
+    tipShow(e,fmtWD(x.d)+(x.d===D.t0?' (today)':''),rows);
+  };
+  const hit=sv('rect',{x:m.l,y:m.t,width:pw,height:ph,class:'pc-hit'});
+  hit.addEventListener('pointermove',function(e){const r=svg.getBoundingClientRect();show(Math.round((e.clientX-r.left-m.l)/pw*(days.length-1)),e);});
+  hit.addEventListener('pointerleave',function(){cross.style.display='none';tipHide();});
+  svg.append(hit);
+  svg.setAttribute('tabindex','0');
+  const anchorAt=function(i){return {type:'keydown',anchor:{getBoundingClientRect:function(){const r=svg.getBoundingClientRect();return {left:r.left+X(i)-1,top:r.top+m.t,width:2,height:ph};}}};};
+  svg.addEventListener('focus',function(){show(cur,anchorAt(cur));});
+  svg.addEventListener('blur',function(){cross.style.display='none';tipHide();});
+  svg.addEventListener('keydown',function(e){
+    const st=e.shiftKey?7:1;
+    if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();const i=cur+(e.key==='ArrowRight'?st:-st);show(i,anchorAt(Math.max(0,Math.min(days.length-1,i))));}
+  });
+  host.replaceChildren(svg);
+}
+function burnupTable(weeks){
+  const D=burnupData(weeks), rows=[];
+  D.days.forEach(function(x,i){ if(i%7===0||x.d===D.t0) rows.push([fmtWD(x.d)+(x.d===D.t0?' (today)':''),x.plan,x.done==null?'':x.done]); });
+  return dataTable(['Day','Planned by then','Done'],rows);
+}
+
+/* ---- chart 2 and 3: columns per week ---- */
+function weekList(weeks){const ws=weekStart(todayISO()), out=[];for(let i=weeks-1;i>=0;i--) out.push(addDays(ws,-7*i));return out;}
+// series: [{id,label,color}], values: week -> {seriesId: number}
+function drawColumns(host,o){
+  const W=Math.max(280,host.clientWidth), H=200, m={l:34,r:8,t:16,b:24}, pw=W-m.l-m.r, ph=H-m.t-m.b;
+  const weeks=o.weeks, tot=weeks.map(function(w){return o.series.reduce(function(a,s){return a+(o.values[w][s.id]||0);},0);});
+  const ticks=yTicks(Math.max(o.minMax||1,Math.max.apply(null,tot)),4), top=ticks[ticks.length-1];
+  const Y=function(v){return m.t+ph-v/top*ph;}, slot=pw/weeks.length, bw=Math.max(4,Math.min(24,slot*0.62));
+  const svg=sv('svg',{width:W,height:H,viewBox:'0 0 '+W+' '+H,class:'pc-svg',role:'img','aria-label':o.aria});
+  ticks.forEach(function(v){
+    svg.append(sv('line',{x1:m.l,x2:m.l+pw,y1:Y(v),y2:Y(v),class:'pc-grid'+(v===0?' base':'')}));
+    const tx=sv('text',{x:m.l-6,y:Y(v)+4,class:'pc-ax','text-anchor':'end'}); tx.textContent=o.fmtAxis?o.fmtAxis(v):fmtNum(v); svg.append(tx);
+  });
+  const every=Math.ceil(weeks.length/Math.max(2,Math.floor(pw/70)));
+  const maxI=tot.indexOf(Math.max.apply(null,tot));
+  weeks.forEach(function(w,i){
+    const cx=m.l+slot*i+slot/2, x=cx-bw/2;
+    if((weeks.length-1-i)%every===0){const tx=sv('text',{x:cx,y:H-7,class:'pc-ax','text-anchor':'middle'});tx.textContent=fmtDM(w);svg.append(tx);}
+    let acc=0; const segs=o.series.filter(function(s){return o.values[w][s.id]>0;});
+    segs.forEach(function(s,si){
+      const v=o.values[w][s.id], y0=Y(acc), y1=Y(acc+v), isTop=si===segs.length-1;
+      const gap=si>0?2:0, hgt=Math.max(1,y0-y1-gap), yTop=y0-gap-hgt, r=isTop?Math.min(4,hgt,bw/2):0;
+      const d='M'+x+' '+(yTop+hgt)+'V'+(yTop+r)+(r?'Q'+x+' '+yTop+' '+(x+r)+' '+yTop:'')+'H'+(x+bw-r)+(r?'Q'+(x+bw)+' '+yTop+' '+(x+bw)+' '+(yTop+r):'')+'V'+(yTop+hgt)+'Z';
+      const p=sv('path',{d:d,class:'pc-bar'}); p.style.fill=s.color; svg.append(p); acc+=v;
+    });
+    if(i===maxI&&tot[i]>0){const tx=sv('text',{x:cx,y:Y(tot[i])-5,class:'pc-lab strong','text-anchor':'middle'});tx.textContent=o.fmtVal?o.fmtVal(tot[i]):fmtNum(tot[i]);svg.append(tx);}
+    const hit=sv('rect',{x:m.l+slot*i,y:m.t,width:slot,height:ph,class:'pc-hit col',tabindex:'0','aria-label':'Week of '+fmtDM(w)+': '+(o.fmtVal?o.fmtVal(tot[i]):tot[i])});
+    const tip=function(e){
+      svg.querySelectorAll('.pc-hit.on').forEach(function(q){q.classList.remove('on');}); hit.classList.add('on');
+      const rows=[{v:o.fmtVal?o.fmtVal(tot[i]):fmtNum(tot[i]),k:o.totalLabel}];
+      o.series.forEach(function(s){const v=o.values[w][s.id]||0;if(v||o.series.length<=3) rows.push({v:o.fmtVal?o.fmtVal(v):fmtNum(v),k:s.label,c:s.color});});
+      tipShow(e,'Week of '+fmtWD(w),rows);
+    };
+    hit.addEventListener('pointermove',tip); hit.addEventListener('focus',tip);
+    hit.addEventListener('pointerleave',function(){hit.classList.remove('on');tipHide();}); hit.addEventListener('blur',function(){hit.classList.remove('on');tipHide();});
+    svg.append(hit);
+  });
+  host.replaceChildren(svg);
+}
+function activitySeries(){return [{id:'ticks',label:'checklist items',color:'var(--accent)'},{id:'steps',label:'steps finished',color:'color-mix(in srgb,var(--accent) 55%,var(--surface))'}];}
+function activityValues(weeks,ev){
+  const v={}; weeks.forEach(function(w){const e=addDays(w,6);v[w]={ticks:sumDays(ev.ticks,w,e),steps:sumDays(ev.steps,w,e)};}); return v;
+}
+function studyValues(weeks,ev){
+  const v={}; weeks.forEach(function(w){const e=addDays(w,6),o={};Object.keys(ev.minsByTrack).forEach(function(d){if(d>=w&&d<=e){const x=ev.minsByTrack[d];Object.keys(x).forEach(function(t){o[t]=(o[t]||0)+x[t]/60;});}});v[w]=o;}); return v;
+}
+function studySeries(){const s=TRACKS.map(function(t){return {id:t.id,label:t.name,color:t.color};});s.push({id:'_other',label:'Not linked to a track',color:'var(--s-todo)'});return s;}
+
+/* ---- the tab ---- */
+function renderProgress(){
+  const view=$('#view'), weeks=progWeeks(), t0=todayISO(), ev=progEvents();
+  const from=addDays(weekStart(t0),-7*(weeks-1)), all=allNodes(), p=prog(all);
+  const plannedNow=all.filter(function(n){return n.date&&n.date<=t0&&getStatus(n.id)!=='skipped';}).length;
+  const gap=p.done-plannedNow;
+  let cd=0,ct=0; all.forEach(function(n){const q=clProg(n);cd+=q.done;ct+=q.total;});
+  const act=activityByDay();
+  const rangeLabel=(PROG_RANGES.find(function(r){return r.w===weeks;})||{}).label;
+  let booked=0; occurrences(from,t0).forEach(function(o){booked+=o.b.mins;});
+  const studied=sumDays(ev.mins,from,t0);
+
+  view.append(h('div',{class:'page-head'},
+    h('div',{class:'overline',text:'How you are doing'}),
+    h('h2',{class:'page-title',text:'Progress'})));
+  const seg=h('div',{class:'segm',role:'group','aria-label':'Time range'});
+  PROG_RANGES.forEach(function(r){seg.append(h('button',{type:'button','aria-pressed':String(r.w===weeks),onclick:function(){viewOpts.progWeeks=r.w;saveView();renderView();},text:r.label}));});
+  view.append(h('div',{class:'pfilters'},h('span',{class:'small muted',text:'Show the last'}),seg));
+
+  const tiles=h('div',{class:'tiles ptiles'},
+    tile(p.pct+'%','Steps done',null,p.done+' of '+p.active+' steps'),
+    tile(gap===0?'On plan':(gap>0?'+'+gap:String(gap)),'Pace',gap<0?'late':(gap>0?'good':''),gap<0?'steps behind the step dates':gap>0?'steps ahead of the step dates':plannedNow+' steps were due by today'),
+    tile(fmtNum(sumDays(ev.ticks,from,t0)),'Checklist items',null,'ticked in the last '+rangeLabel+' ('+cd+' of '+ct+' in all)'),
+    tile(fmtHours(studied),'Study time',null,'done in the last '+rangeLabel+(booked?' of '+fmtHours(booked)+' booked':'')),
+    tile(String(streakDays(act)),'Streak',null,'days in a row, best '+bestStreak(act)));
+  view.append(tiles);
+
+  // plan vs done
+  const bu=h('div',{class:'pchart','data-chart':'burnup'});
+  view.append(h('section',{class:'panel'},
+    h('div',{class:'panel-head'},h('h3',{text:'Planned vs done'}),h('span',{class:'panel-sub',text:'All steps, counted on their dates'})),
+    h('div',{class:'plegend'},lineKey('Planned (step dates)','var(--muted)',true),lineKey('Done','var(--accent)')),
+    bu,burnupTable(weeks),
+    h('p',{class:'small muted pnote',text:gap<0?'You are '+(-gap)+' step'+(gap===-1?'':'s')+' behind the dates in the roadmap. Finish one or move the dates with an instruction like "push pandas by 1 week".':gap>0?'You are '+gap+' step'+(gap===1?'':'s')+' ahead of the dates in the roadmap.':'You are exactly on the dates in the roadmap.'})));
+
+  // pace by track
+  const pace=h('div',{class:'pace'}), paceRows=[];
+  TRACKS.forEach(function(t){
+    const ns=(t.nodes||[]).filter(function(n){return getStatus(n.id)!=='skipped';});
+    const done=ns.filter(function(n){return getStatus(n.id)==='done';}).length, due=ns.filter(function(n){return n.date&&n.date<=t0;}).length, tot=ns.length||1, g=done-due;
+    const bar=h('span',{class:'pc-bullet'},h('span',{class:'pb-fill'}),h('span',{class:'pb-mark'}));
+    bar.firstChild.style.width=(done/tot*100)+'%'; bar.lastChild.style.left='calc('+(due/tot*100)+'% - 1px)';
+    const st=g<0?{c:'behind',t:(-g)+' behind'}:g>0?{c:'ahead',t:g+' ahead'}:{c:'even',t:'on plan'};
+    const row=h('button',{class:'pace-row',type:'button',onclick:function(){setTab(t.id);},'aria-label':t.name+': '+done+' of '+ns.length+' done, '+due+' due by today, '+st.t+'. Open the track.'},
+      h('span',{class:'tp-name'},h('i'),t.name),bar,
+      h('span',{class:'pace-n',text:done+' / '+ns.length}),
+      h('span',{class:'pace-st '+st.c},h('i',{'aria-hidden':'true'}),st.t));
+    row.style.setProperty('--tc',t.color);
+    row.addEventListener('pointermove',function(e){tipShow(e,t.name,[{v:String(done),k:'done',c:t.color},{v:String(due),k:'due by today'},{v:String(ns.length),k:'steps in all'}]);});
+    row.addEventListener('pointerleave',tipHide);
+    pace.append(row); paceRows.push([t.name,done,due,ns.length,st.t]);
+  });
+  const ov=h('div',{class:'ov-row prow'});
+  ov.append(h('section',{class:'panel'},
+    h('div',{class:'panel-head'},h('h3',{text:'Pace by track'}),h('span',{class:'panel-sub',text:'Bar = done, line = due by today'})),
+    pace,dataTable(['Track','Done','Due by today','Steps','Pace'],paceRows)));
+
+  // checklists
+  const cls=all.filter(function(n){return n.checklist&&n.checklist.length&&getStatus(n.id)!=='skipped';}).map(function(n){const q=clProg(n);return {n:n,t:INDEX[n.id].track,d:q.done,tot:q.total};});
+  cls.sort(function(a,b){
+    const ra=a.d>=a.tot?2:a.d>0?0:1, rb=b.d>=b.tot?2:b.d>0?0:1;
+    if(ra!==rb) return ra-rb;
+    if(ra===0) return b.d/b.tot-a.d/a.tot;
+    return (a.n.date||'9')<(b.n.date||'9')?-1:1;
+  });
+  const clBox=h('div',{class:'cl-prog'}), showAll=!!viewOpts.progAllCl;
+  (showAll?cls:cls.slice(0,7)).forEach(function(x){
+    const bar=h('span',{class:'tp-bar'},h('span',{})); bar.firstChild.style.width=(x.d/x.tot*100)+'%';
+    const r=h('button',{class:'clp-row',type:'button',onclick:function(e){openPanel(x.n.id,e.currentTarget);},'aria-label':x.n.title+': '+x.d+' of '+x.tot+' ticked'},
+      h('span',{class:'clp-t'},h('i'),h('span',{text:x.n.title})),bar,h('span',{class:'tp-pct',text:x.d+'/'+x.tot}));
+    r.style.setProperty('--tc',x.t.color); clBox.append(r);
+  });
+  const clSec=h('section',{class:'panel'},
+    h('div',{class:'panel-head'},h('h3',{text:'Checklists'}),h('span',{class:'panel-sub',text:cls.filter(function(x){return x.d>=x.tot;}).length+' of '+cls.length+' complete'})),clBox);
+  if(cls.length>7) clSec.append(h('button',{class:'linkbtn',type:'button',text:showAll?'Show fewer':'Show all '+cls.length,onclick:function(){viewOpts.progAllCl=!showAll;saveView();renderView();}}));
+  ov.append(clSec);
+  view.append(ov);
+
+  // weekly activity + study time
+  const wk=weekList(weeks), aHost=h('div',{class:'pchart','data-chart':'activity'}), sHost=h('div',{class:'pchart','data-chart':'study'});
+  const aVals=activityValues(wk,ev), sVals=studyValues(wk,ev), sSer=studySeries().filter(function(s){return wk.some(function(w){return sVals[w][s.id]>0;});});
+  const row2=h('div',{class:'ov-row prow even'});
+  row2.append(h('section',{class:'panel'},
+    h('div',{class:'panel-head'},h('h3',{text:'Done per week'}),h('span',{class:'panel-sub',text:'Checklist ticks and finished steps'})),
+    h('div',{class:'plegend'},activitySeries().map(function(s){return swatchKey(s.label,s.color);})),
+    aHost,dataTable(['Week of','Checklist items','Steps finished'],wk.map(function(w){return [fmtWD(w),aVals[w].ticks,aVals[w].steps];}))));
+  const sSec=h('section',{class:'panel'},
+    h('div',{class:'panel-head'},h('h3',{text:'Study time per week'}),h('span',{class:'panel-sub',text:'Calendar sessions marked done'})));
+  if(sSer.length){
+    sSec.append(h('div',{class:'plegend'},sSer.map(function(s){return swatchKey(s.label,s.color);})),sHost,
+      dataTable(['Week of'].concat(sSer.map(function(s){return s.label;})).concat(['Total']),wk.map(function(w){let tt=0;const r=[fmtWD(w)];sSer.forEach(function(s){const v=sVals[w][s.id]||0;tt+=v;r.push(fmtHours(v*60));});r.push(fmtHours(tt*60));return r;})));
+  }else{
+    sSec.append(h('div',{class:'empty-ill'},h('span',{class:'ei-ico','aria-hidden':'true'}),h('span',{text:'No study sessions marked done in the last '+rangeLabel+'.'})),
+      h('p',{class:'small muted',text:'Book time in the Calendar (or "Book study time" on a track) and tick the session when you finish it. The hours show up here by track.'}));
+  }
+  row2.append(sSec);
+  view.append(row2);
+
+  // recently finished
+  const rec=[];
+  Object.keys(state.checks).forEach(function(k){
+    const d=state.checks[k]; if(typeof d!=='string') return;
+    const p2=k.split('::'), x=INDEX[p2[0]]; if(!x) return;
+    const it=(x.node.checklist||[]).find(function(i){return i.id===p2[1];}); if(!it) return;
+    rec.push({d:d,what:it.label,where:x.node.title,t:x.track,id:x.node.id,kind:'Ticked'});
+  });
+  all.forEach(function(n){const d=doneDate(n);if(d) rec.push({d:d,what:n.title,where:INDEX[n.id].track.name,t:INDEX[n.id].track,id:n.id,kind:'Finished'});});
+  rec.sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:0;});
+  const recSec=h('section',{class:'panel'},h('div',{class:'panel-head'},h('h3',{text:'Recently finished'}),h('span',{class:'panel-sub',text:rec.length?rec.length+' in all':''})));
+  if(!rec.length) recSec.append(h('div',{class:'empty',text:'Nothing finished yet. Tick a checklist item or mark a step done and it shows up here.'}));
+  else{
+    const ul=h('ul',{class:'rec'});
+    rec.slice(0,10).forEach(function(r){
+      const li=h('li',{},h('span',{class:'rec-d',text:fmtDM(r.d)}),
+        h('button',{class:'rec-b',type:'button',onclick:function(e){openPanel(r.id,e.currentTarget);}},
+          h('span',{class:'rec-w'},h('span',{class:'rec-k',text:r.kind}),' ',r.what),
+          h('span',{class:'rec-m'},h('i'),r.where)));
+      li.style.setProperty('--tc',r.t.color); ul.append(li);
+    });
+    recSec.append(ul);
+  }
+  view.append(recSec);
+
+  drawProgCharts=function(){
+    const w2=progWeeks();
+    const b=$('#view .pchart[data-chart="burnup"]'); if(b) drawBurnup(b,w2);
+    const a=$('#view .pchart[data-chart="activity"]'); if(a) drawColumns(a,{weeks:wk,series:activitySeries(),values:aVals,aria:'Checklist items and steps done per week',totalLabel:'done in all'});
+    const s=$('#view .pchart[data-chart="study"]'); if(s) drawColumns(s,{weeks:wk,series:sSer,values:sVals,aria:'Study hours per week by track',totalLabel:'studied in all',fmtVal:function(v){return fmtHours(v*60);},fmtAxis:function(v){return fmtNum(v)+'h';},minMax:1});
+  };
+  drawProgCharts();
+}
+let drawProgCharts=function(){}, progResizeT=null;
+window.addEventListener('resize',function(){
+  if(currentTab!=='prog') return;
+  clearTimeout(progResizeT); progResizeT=setTimeout(function(){drawProgCharts();},120);
+});
 
 /* ---------- panel ---------- */
 function section(title,child){return h('div',{class:'p-sec'},h('h3',{text:title}),child);}
@@ -5992,7 +6419,7 @@ function helpBox(){
     ['Progress','solved two sum','finished numpy','mark pandas in progress','skip mongodb','unit 5 done','untick reverse a number'],
     ['Dates','move pandas to 20 dec','push pandas by 1 week','push dsa by 2 weeks','push everything by 3 days','push pandas and everything after it by 1 week','bring forward linux by 2 days'],
     ['Change steps','add "Learn Git rebase" to backend on 5 jan','add side step "Watch CS50 SQL" under sql course','rename linux basics to Linux and bash','delete mongodb','make docker depend on linux','verify pandas / confirm pandas'],
-    ['Calendar','schedule dsa every day at 7pm for 1 hour','schedule pandas tomorrow 6pm for 90 min','schedule math every mon wed fri at 7:30am for 45 min until 20 dec','block 2 hours for linux on saturday 10am','move dsa session to 8pm','clear schedule on friday','did my dsa session','today'],
+    ['Calendar','schedule dsa every day at 7pm for 1 hour','schedule pandas tomorrow 6pm for 90 min','schedule math every mon wed fri at 7:30am for 45 min until 20 dec','block 2 hours for linux on saturday 10am','move dsa session to 8pm','clear schedule on friday','did my dsa session','today','how am i doing'],
     ['AI assistant (AI button on, or start with "ai:")','move every statistics step two weeks later except the exam ones','book 45 min of DSA every weekday at 7am until 20 dec, not on fridays','I finished all the easy array problems','add a step after the SQL course to learn dbt, with three actions','ai settings','new chat'],
     ['Notes and links','note pandas: redo the groupby part','add link My playlist https://youtube.com/... to dsa1','open graphs','undo','help']];
   const grid=h('div',{class:'help-grid'});
@@ -6579,6 +7006,7 @@ function findBlocks(q){
 function runScheduleCommand(q){
   let m;
   if(/^(calendar|today|what'?s on today|what is on today|my day|show calendar|open calendar|schedule)$/i.test(q)){setTab('cal');out().replaceChildren();return true;}
+  if(/^(progress|dashboard|stats|statistics|show (my )?progress|how am i doing|am i on track)\??$/i.test(q)){setTab('prog');out().replaceChildren();return true;}
   if((m=q.match(/^(?:schedule|plan|book|block|put|add)\s+(?:a |an |some )?(?:time |session |block |slot )?(?:for |of )?(.+?)(?:\s+(?:to|on|in) (?:the )?calendar)?$/i))&&/\d/.test(q)&&/(am|pm|:\d\d|\bat\b|\bfor\b)/i.test(q)){cmdSchedule(m[1]);return true;}
   if((m=q.match(/^(?:clear|empty|free|wipe)\s+(?:my |the )?(?:calendar|schedule|day)?\s*(?:on|for)?\s*(.+)$/i))){
     const d=parseDateText(m[1]); if(!d) return false;
@@ -7536,7 +7964,7 @@ function init(){
   initTheme(); load(); loadCustom();
   useData(custom?clone(custom.data):clone(ROADMAP));
   let saved=null; try{saved=localStorage.getItem(TAB_KEY);}catch(e){}
-  currentTab=(saved==='week'||saved==='all'||saved==='cal'||TRACKS.some(function(t){return t.id===saved;}))?saved:'week';
+  currentTab=(saved==='week'||saved==='all'||saved==='cal'||saved==='prog'||TRACKS.some(function(t){return t.id===saved;}))?saved:'week';
   if(viewOpts.calMode) calMode=viewOpts.calMode;
   renderLegend(); renderAll();
   $('#themeBtn').addEventListener('click',toggleTheme);

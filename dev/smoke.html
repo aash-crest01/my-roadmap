@@ -49,11 +49,11 @@ function check(cond,info){if(!cond) throw new Error(info||'check failed');}
 test('page loads with all tracks',async()=>{
   const P=await loadPage();
   check(P.R.data().tracks.length===6,'tracks: '+P.R.data().tracks.length);
-  check(P.d.querySelectorAll('#tabs .tab').length===9,'tabs');
+  check(P.d.querySelectorAll('#tabs .tab').length===10,'tabs');
 });
-test('no sideways scroll at phone width (This week, Overview, a track)',async()=>{
+test('no sideways scroll at phone width (This week, Overview, Progress, a track)',async()=>{
   const P=await loadPage(390);
-  for(const name of ['This week','Overview']){
+  for(const name of ['This week','Overview','Progress']){
     btn(P,name).click(); await sleep(100);
     const de=P.d.documentElement; check(de.scrollWidth<=de.clientWidth,name+': scrollWidth '+de.scrollWidth+' > '+de.clientWidth);
   }
@@ -124,6 +124,36 @@ test('less clutter: legend and goal line only on Overview, goal card on This wee
   check(!/Not started/.test(P.d.querySelector('#view .path').textContent),'"Not started" still shown on steps');
   btn(P,'Overview').click(); await sleep(80);
   check(!P.d.getElementById('legend').hidden&&!P.d.getElementById('goalLine').hidden,'legend/goal missing on Overview');
+});
+
+/* ---------- progress dashboard ---------- */
+test('Progress tab: tiles, charts with tables, pace per track; opens from the instruction box',async()=>{
+  const P=await loadPage();
+  run(P,'how am i doing'); await sleep(100);
+  check(P.d.querySelector('#tabs [aria-selected="true"]').textContent.trim()==='Progress','instruction did not open Progress');
+  const v=P.d.getElementById('view');
+  check(v.querySelectorAll('.ptiles .tile').length===5,'tiles: '+v.querySelectorAll('.ptiles .tile').length);
+  check(v.querySelector('.pchart[data-chart="burnup"] svg .pc-line.plan')&&v.querySelector('.pchart[data-chart="burnup"] svg .pc-line.done'),'planned vs done chart not drawn');
+  check(v.querySelector('.pchart[data-chart="activity"] svg'),'done-per-week chart not drawn');
+  check(v.querySelectorAll('.pace-row').length===6,'pace rows: '+v.querySelectorAll('.pace-row').length);
+  check(v.querySelectorAll('details.tview table').length>=3,'charts have no table view');
+  check(/No study sessions/.test(v.textContent),'no empty state for study time on a fresh page');
+  check(/Nothing finished yet/.test(v.textContent),'no empty state for recently finished');
+});
+test('Progress tab follows ticks, finished steps and done study sessions',async()=>{
+  const P=await loadPage();
+  tab(P,'Python').click(); await sleep(80);
+  P.d.querySelector('.qtick[data-id="py1"]').click(); await sleep(60);
+  run(P,'schedule py2 today 6am for 90 min'); await sleep(50); btn(P,'Add to calendar').click(); await sleep(60);
+  const b=Object.values(P.R.state().sched)[0]; b.done[P.R.state().doneAt.py1]=true;   // mark today's session done
+  btn(P,'Progress').click(); await sleep(120);
+  const v=P.d.getElementById('view');
+  check(/Done 1/.test(v.querySelector('.pchart[data-chart="burnup"]').textContent),'burn-up does not show 1 done');
+  check(/FINISHED|Finished/.test(v.querySelector('.rec').textContent)&&/py1|Python|NumPy|Kaggle/i.test(v.querySelector('.rec').textContent),'step not in recently finished');
+  check(v.querySelector('.pchart[data-chart="study"] svg .pc-bar'),'study chart has no bar for the done session');
+  check(/1\.5 h/.test(v.querySelector('.ptiles').textContent),'study time tile is not 1.5 h: '+v.querySelector('.ptiles').textContent);
+  btn(P,'4 weeks').click(); await sleep(100);
+  check(P.d.querySelectorAll('#view .pchart[data-chart="activity"] .pc-hit.col').length===4,'range buttons do not change the weeks shown');
 });
 
 /* ---------- visual refresh ---------- */

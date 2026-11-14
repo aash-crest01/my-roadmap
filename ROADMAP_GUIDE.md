@@ -3,6 +3,7 @@
 ## 1. What is in this version
 
 - **Overview tab** (called Whole roadmap before). Summary tiles, a progress ring per track, a 12-week activity grid, the 5 phases with "You are here", then every track on one timeline grouped by phase and month, with a red "Today" line and filters (hide a track, hide finished steps, hide side steps).
+- **Progress tab.** A dashboard of how you are doing (section 2b).
 - **This week dashboard.** What is due, overdue and in progress on the left; on the right your goal countdown, today's sessions (with a one-click "Book 30 min" for the next step that has no time booked), progress per track and a 7-day study streak.
 - **Checklists you tick one by one.**
   - DSA: all 267 items of your Code and Debug "Master DSA with LeetCode" sheet, each with its Problem, Video and Notes links. The 166 extra problems from the "Zero to Hero" sheet sit in dashed "Advanced set" side steps for a second pass.
@@ -18,7 +19,7 @@
 ## 2. Finding your way around
 
 - The bar at the top stays visible: title, an overall progress ring (click it to open Overview), the instruction box, help (?) and dark/light mode. A thin green line under it fills up as you finish steps.
-- The tabs below it are split in two: views (This week, Calendar, Overview) on the left, then one tab per track with a small progress ring and its percentage. Swipe or scroll the tabs sideways to see the rest.
+- The tabs below it are split in two: views (This week, Calendar, Overview, Progress) on the left, then one tab per track with a small progress ring and its percentage. Swipe or scroll the tabs sideways to see the rest.
 - Results of an instruction appear in a small box under the instruction field, on top of the page. Simple confirmations close by themselves after a few seconds; click anywhere else or press Esc to close them sooner.
 - On a phone, the title row hides when you scroll down so only the instruction box and tabs stay pinned.
 - Keyboard: press `/` to jump to the instruction box, `?` for examples, `Esc` to close boxes and panels.
@@ -36,6 +37,19 @@ Each track tab opens at your first unfinished step, marked "You are here". The t
 The study streak and the activity grid count a day as active when you tick a checklist item, finish a step or mark a study session done.
 
 "Done" means you can do it again from a blank page without notes. If not, leave it In progress.
+
+## 2b. The Progress tab
+
+Pick the period at the top (last 4 weeks, 12 weeks or 6 months). Everything below uses it.
+
+- **Tiles:** steps done, pace (how many steps ahead of or behind the dates in the roadmap), checklist items ticked, study time done (and booked) and your streak with your best one.
+- **Planned vs done:** a dashed line counts steps by their dates, the solid line counts steps you finished. Where the solid line is above the dashed one at "Today", you are ahead. Point at the chart (or focus it and use the arrow keys) to read any day.
+- **Pace by track:** the bar is how much of the track is done; the thin line is how much was due by today. Click a row to open the track.
+- **Checklists:** checklist steps, the ones you have started first. Click one to open it.
+- **Done per week** and **Study time per week:** columns per week. Study time counts calendar sessions you marked done, split by track.
+- **Recently finished:** the last 10 ticks and finished steps.
+
+Every chart has **Show as table** for the exact numbers. A checklist step that finished by its ticks counts as done on the day of its last tick.
 
 ## 3. The instruction box (plain English)
 
@@ -89,6 +103,7 @@ The **Calendar** tab shows a live clock, what is happening now and next, today's
 | Free a day | `clear schedule on friday` (repeating blocks are skipped that day only) |
 | Remove a block and its repeats | `unschedule gym` |
 | Jump to the calendar | `today` or `calendar` |
+| Open the Progress dashboard | `progress`, `dashboard` or `how am i doing` |
 
 A time written without am/pm, like `at 7`, is read as evening (7pm) for 1 to 6, and as written otherwise (`at 10` is 10am). Put the step name first and the time after it.
 
@@ -254,7 +269,7 @@ Browser storage is separate for each web address. With sync on, connecting at th
 
 ## 10. Ten-minute weekly review (same day every week)
 
-1. **0-2 min: update.** Open This week. Tick what you finished and set statuses.
+1. **0-2 min: update.** Open This week. Tick what you finished and set statuses. Glance at Progress: is the pace for each track ahead or behind?
    Then open Calendar and book time for anything in "Due soon with no time booked".
 2. **2-5 min: overdue.** For each overdue step, do it this week, move it (`push pandas by 1 week`), or skip it. Do not leave anything overdue without a decision.
 3. **5-7 min: calendar.** Check college deadlines for the next two weeks. If an exam or submission week is coming, push study steps (`push everything by 1 week`).
