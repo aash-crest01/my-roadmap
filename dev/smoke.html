@@ -51,10 +51,14 @@ test('page loads with all tracks',async()=>{
   check(P.R.data().tracks.length===6,'tracks: '+P.R.data().tracks.length);
   check(P.d.querySelectorAll('#tabs .tab').length===9,'tabs');
 });
-test('Overview has no sideways scroll at phone width',async()=>{
+test('no sideways scroll at phone width (This week, Overview, a track)',async()=>{
   const P=await loadPage(390);
-  btn(P,'Overview').click(); await sleep(100);
-  const de=P.d.documentElement; check(de.scrollWidth<=de.clientWidth,'scrollWidth '+de.scrollWidth+' > '+de.clientWidth);
+  for(const name of ['This week','Overview']){
+    btn(P,name).click(); await sleep(100);
+    const de=P.d.documentElement; check(de.scrollWidth<=de.clientWidth,name+': scrollWidth '+de.scrollWidth+' > '+de.clientWidth);
+  }
+  tab(P,'DSA').click(); await sleep(100);
+  const de=P.d.documentElement; check(de.scrollWidth<=de.clientWidth,'DSA: scrollWidth '+de.scrollWidth+' > '+de.clientWidth);
 });
 test('closed side panel cannot be reached with Tab',async()=>{
   const P=await loadPage();
@@ -111,13 +115,63 @@ test('This week shows today\'s study sessions',async()=>{
   btn(P,'This week').click(); await sleep(80);
   const row=P.d.querySelector('#view .today-list .tdl'); check(row&&/11:30pm/.test(row.textContent),'session not listed on This week');
 });
-test('less clutter: legend only on Overview, goal only on summary views, no "Not started" labels',async()=>{
+test('less clutter: legend and goal line only on Overview, goal card on This week, no "Not started" labels',async()=>{
   const P=await loadPage();
+  check(P.d.getElementById('goalLine').hidden,'goal line shown on This week');
+  check(P.d.querySelector('#view .goal-card .gc-num'),'no goal card on This week');
   tab(P,'DSA').click(); await sleep(80);
   check(P.d.getElementById('legend').hidden&&P.d.getElementById('goalLine').hidden,'legend/goal shown on a track');
   check(!/Not started/.test(P.d.querySelector('#view .path').textContent),'"Not started" still shown on steps');
   btn(P,'Overview').click(); await sleep(80);
   check(!P.d.getElementById('legend').hidden&&!P.d.getElementById('goalLine').hidden,'legend/goal missing on Overview');
+});
+
+/* ---------- visual refresh ---------- */
+test('status icons follow the status, and tabs show a progress ring per track',async()=>{
+  const P=await loadPage();
+  check(P.d.querySelectorAll('#tabs .tab.trk svg.ring').length===6,'track tabs without a ring');
+  tab(P,'Python').click(); await sleep(80);
+  const ico=()=>P.d.querySelector('.qtick[data-id="py1"] svg.sicon');
+  check(ico()&&ico().classList.contains('s-todo'),'py1 icon is not "todo"');
+  run(P,'mark py1 as in progress'); await sleep(60);
+  check(P.R.status('py1')==='doing'&&ico().classList.contains('s-doing'),'icon did not change to "doing"');
+  P.d.querySelector('.qtick[data-id="py1"]').click(); await sleep(60);
+  check(ico().classList.contains('s-done'),'icon did not change to "done"');
+  tab(P,'DSA').click(); await sleep(80);
+  check(P.d.querySelector('.qtick.cl svg.sicon .q-list'),'checklist step has no checklist icon');
+  btn(P,'Overview').click(); await sleep(80);
+  check(P.d.querySelectorAll('#legend svg.sicon').length===4,'legend does not use the status icons');
+});
+test('a tick today starts the streak and lights today on the activity grid',async()=>{
+  const P=await loadPage();
+  check(/0 days/.test(P.d.querySelector('#view .streak-num').textContent),'streak not 0 on a fresh page');
+  check(!P.d.querySelector('#view .sd.today.on'),'today already marked');
+  tab(P,'Python').click(); await sleep(80);
+  P.d.querySelector('.qtick[data-id="py1"]').click(); await sleep(60);
+  btn(P,'This week').click(); await sleep(80);
+  check(/^1 day$/.test(P.d.querySelector('#view .streak-num').textContent),'streak: '+P.d.querySelector('#view .streak-num').textContent);
+  check(P.d.querySelector('#view .sd.today.on'),'today not marked in the week strip');
+  btn(P,'Overview').click(); await sleep(80);
+  check(P.d.querySelectorAll('#view .hm-grid .hm').length===84,'activity grid is not 12 weeks');
+  check(P.d.querySelector('#view .hm.today.l1'),'today square not lit');
+  check(P.d.querySelectorAll('#view .tring').length===6,'Overview has no ring per track');
+});
+test('This week offers to book time for the next step due without a session',async()=>{
+  const P=await loadPage();
+  const b=btn(P,'Book 30 min for it');
+  if(!b){ check(/Nothing booked for today/.test(P.d.getElementById('view').textContent),'no Today card'); return; }   // nothing due in 7 days
+  b.click(); await sleep(80);
+  check(P.d.getElementById('panel').classList.contains('open'),'block form did not open');
+});
+test('a track shows month labels, "You are here" and a ticked spine up to the current step',async()=>{
+  const P=await loadPage();
+  const mains=P.R.data().tracks.find(t=>t.id==='dsa').nodes.filter(n=>n.type!=='branch');
+  mains.slice(0,2).forEach(n=>{P.R.state().status[n.id]='done';});
+  tab(P,'DSA').click(); await sleep(100);
+  check(P.d.querySelectorAll('#view .row.past').length===2,'past rows: '+P.d.querySelectorAll('#view .row.past').length);
+  const cur=P.d.querySelector('#view .row.cur'); check(cur&&cur.querySelector('.n-here'),'no "You are here" on the current step');
+  check([...P.d.querySelectorAll('#view .r-month')].some(m=>/\d{4}/.test(m.textContent)),'no month labels');
+  check(P.d.querySelector('#view .big-ring svg.ring'),'no progress ring in the track header');
 });
 test('a track opens at the first unfinished step',async()=>{
   const P=await loadPage(1100);

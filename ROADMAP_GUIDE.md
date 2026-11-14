@@ -2,7 +2,8 @@
 
 ## 1. What is in this version
 
-- **Overview tab** (called Whole roadmap before). Every track on one timeline, grouped into 5 phases and by month, with a red "Today" line, a progress row per track, and filters (hide a track, hide finished steps, hide side steps).
+- **Overview tab** (called Whole roadmap before). Summary tiles, a progress ring per track, a 12-week activity grid, the 5 phases with "You are here", then every track on one timeline grouped by phase and month, with a red "Today" line and filters (hide a track, hide finished steps, hide side steps).
+- **This week dashboard.** What is due, overdue and in progress on the left; on the right your goal countdown, today's sessions (with a one-click "Book 30 min" for the next step that has no time booked), progress per track and a 7-day study streak.
 - **Checklists you tick one by one.**
   - DSA: all 267 items of your Code and Debug "Master DSA with LeetCode" sheet, each with its Problem, Video and Notes links. The 166 extra problems from the "Zero to Hero" sheet sit in dashed "Advanced set" side steps for a second pass.
   - Math: the 16 Khan Academy Statistics and probability units. Units 3 and 4 are already ticked because your screenshot shows them at Proficient.
@@ -17,18 +18,22 @@
 ## 2. Finding your way around
 
 - The bar at the top stays visible: title, an overall progress ring (click it to open Overview), the instruction box, help (?) and dark/light mode. A thin green line under it fills up as you finish steps.
-- The tabs below it are split in two: views (This week, Calendar, Overview) on the left, then one tab per track with its percentage. Swipe or scroll the tabs sideways to see the rest.
+- The tabs below it are split in two: views (This week, Calendar, Overview) on the left, then one tab per track with a small progress ring and its percentage. Swipe or scroll the tabs sideways to see the rest.
 - Results of an instruction appear in a small box under the instruction field, on top of the page. Simple confirmations close by themselves after a few seconds; click anywhere else or press Esc to close them sooner.
 - On a phone, the title row hides when you scroll down so only the instruction box and tabs stay pinned.
 - Keyboard: press `/` to jump to the instruction box, `?` for examples, `Esc` to close boxes and panels.
 
 ## 2a. Daily use
 
-1. Open **This week**. At the top are today's booked study sessions, then what is due in the next 7 days and anything overdue.
-2. Click the round tick on a card or timeline step to mark it done in one click. A message appears with **Undo** for a few seconds. Steps with a checklist show a dashed list icon instead: it opens the checklist, because their status follows your ticks.
+1. Open **This week**. The left column lists anything overdue, what is due in the next 7 days, other steps in progress and what comes next. The right column shows the goal countdown, today's booked sessions, progress per track and your study streak.
+2. Click the round status icon on a card or timeline step to mark it done in one click. A message appears with **Undo** for a few seconds. Steps with a checklist show a list icon whose ring fills as you tick; clicking it opens the checklist, because their status follows your ticks.
 3. Or click a step to open it and pick a status, or type what you did in the instruction box, for example `solved two sum`.
 
-Each track tab opens at your first unfinished step (outlined), with a red "Today" line on the timeline. The colour key is on the Overview tab; a grey left border means not started.
+The status icon means: empty ring = not started, half-filled = in progress, green check = done, dashed ring with a slash = skipped. The key is on the Overview tab.
+
+Each track tab opens at your first unfinished step, marked "You are here". The timeline runs down a line with month labels on the left; the line is coloured up to where you are, a red "Today" line marks the date, and side steps sit to the right (below on a phone). "Book study time" in the track header schedules a session for that track.
+
+The study streak and the activity grid count a day as active when you tick a checklist item, finish a step or mark a study session done.
 
 "Done" means you can do it again from a blank page without notes. If not, leave it In progress.
 
