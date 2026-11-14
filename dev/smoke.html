@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Roadmap smoke test</title>
+<style>body{margin:0;font:14px system-ui}iframe{border:0;display:block}</style></head>
+<body>
+<script>
+/* Each check loads roadmap.html fresh in an iframe (same origin, so the test
+   can reach window.__roadmap and the DOM) and reports pass/fail to
+   dev/run_smoke.py. Run it with: python dev/run_smoke.py */
+const results=[], pageErrors=[];
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function until(fn,ms){const t=Date.now();while(Date.now()-t<(ms||8000)){try{if(fn())return true;}catch(e){}await sleep(50);}return false;}
+const GH=location.origin+'/gh';
+const SYNC_KEY='roadmap-sync-v1';
+function tomorrow(){const d=new Date();d.setDate(d.getDate()+1);return d.toISOString().slice(0,10);}
+function plusDays(iso,n){const p=iso.split('-').map(Number);const d=new Date(p[0],p[1]-1,p[2]+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+
+function loadPage(width,setup,keep){
+  return new Promise(res=>{
+    document.querySelectorAll('iframe').forEach(f=>f.remove());
+    if(!keep) localStorage.clear(); else ['roadmap-tab-v1','roadmap-view-v2'].forEach(k=>localStorage.removeItem(k));
+    if(setup) setup();
+    const f=document.createElement('iframe'); f.style.width=(width||1100)+'px'; f.style.height='800px';
+    f.onload=async()=>{
+      const w=f.contentWindow, d=w.document;
+      w.addEventListener('error',e=>pageErrors.push(String(e.message)));
+      w.confirm=()=>true;
+      w.__blobs=[]; const orig=w.URL.createObjectURL.bind(w.URL);
+      w.URL.createObjectURL=b=>{w.__blobs.push(b);return orig(b);};
+      w.HTMLAnchorElement.prototype.click=function(){};           // no real downloads
+      await sleep(80);
+      res({f,w,d,R:w.__roadmap});
+    };
+    f.src='/roadmap.html';
+    document.body.append(f);
+  });
+}
+function run(P,text){P.d.getElementById('cmdInput').value=text;P.d.getElementById('cmdForm').requestSubmit();}
+function btn(P,label,scope){return [...(scope||P.d).querySelectorAll('button')].find(b=>b.textContent.trim()===label);}
+async function lastBlobText(P){const b=P.w.__blobs[P.w.__blobs.length-1];return b?await b.text():'';}
+function cmdText(P){return P.d.getElementById('cmdOut').innerText;}
+async function gist(id){const r=await fetch(GH+'/gists/'+id,{headers:{Authorization:'Bearer test-token'}});const j=await r.json();return JSON.parse(j.files['roadmap-sync.json'].content);}
+
+const tests=[];
+function test(name,fn){tests.push({name,fn});}
+function check(cond,info){if(!cond) throw new Error(info||'check failed');}
+
+/* ---------- basics ---------- */
+test('page loads with all tracks',async()=>{
+  const P=await loadPage();
+  check(P.R.data().tracks.length===6,'tracks: '+P.R.data().tracks.length);
+  check(P.d.querySelectorAll('#tabs .tab').length===9,'tabs');
+});
+test('Overview has no sideways scroll at phone width',async()=>{
+  const P=await loadPage(390);
+  btn(P,'Overview').click(); await sleep(100);
+  const de=P.d.documentElement; check(de.scrollWidth<=de.clientWidth,'scrollWidth '+de.scrollWidth+' > '+de.clientWidth);
+});
+test('closed side panel cannot be reached with Tab',async()=>{
+  const P=await loadPage();
+  P.d.querySelector('.card,.node').click(); await sleep(50);
+  P.d.querySelector('#panel [data-close]').click(); await sleep(50);
+  check(P.d.getElementById('panel').inert===true,'panel is not inert when closed');
+});
+test('focus stays inside the open panel',async()=>{
+  const P=await loadPage();
+  P.d.querySelector('.card,.node').click(); await sleep(50);
+  check(P.d.querySelector('main').inert===true,'page behind the panel is not inert');
+  const foc=[...P.d.querySelectorAll('#panel button,#panel a[href],#panel input,#panel textarea,#panel select')].filter(e=>!e.disabled&&e.offsetParent!==null);
+  const last=foc[foc.length-1]; last.focus();
+  const ev=new P.w.KeyboardEvent('keydown',{key:'Tab',bubbles:true,cancelable:true}); last.dispatchEvent(ev);
+  check(ev.defaultPrevented&&P.d.activeElement===foc[0],'Tab from the last control did not wrap to the first');
+  P.d.querySelector('#panel [data-close]').click(); await sleep(50);
+  check(P.d.querySelector('main').inert===false,'page stays inert after closing');
+});
+test('reminder clock runs without opening the Calendar tab',async()=>{
+  const P=await loadPage();
+  check(P.R.reminders()===true,'reminder timer not running on This week');
+});
+test('arrow keys move between tabs',async()=>{
+  const P=await loadPage();
+  const first=P.d.querySelector('#tabs .tab'); first.focus();
+  first.dispatchEvent(new P.w.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true,cancelable:true})); await sleep(50);
+  const sel=P.d.querySelector('#tabs [aria-selected="true"]');
+  check(/Calendar/.test(sel.textContent),'selected: '+sel.textContent);
+  check(P.d.activeElement===sel,'focus did not follow the selected tab');
+});
+
+/* ---------- data fixes ---------- */
+test('deleting a step keeps its calendar sessions named and coloured',async()=>{
+  const P=await loadPage();
+  run(P,'schedule py2 tomorrow 6pm for 90 min'); await sleep(50);
+  btn(P,'Add to calendar').click(); await sleep(50);
+  const title=P.R.data().tracks.find(t=>t.id==='py').nodes.find(n=>n.id==='py2').title;
+  run(P,'delete py2'); await sleep(50); btn(P,'Delete').click(); await sleep(50);
+  const b=Object.values(P.R.sched())[0];
+  check(b&&b.title===title&&b.stepId===''&&b.trackId==='py','block after delete: '+JSON.stringify(b));
+});
+test('session crossing midnight: .ics end is next day, grid stays in its column',async()=>{
+  const P=await loadPage();
+  const d=tomorrow();
+  P.R.state().sched.x={id:'x',title:'Late study',date:d,start:'23:00',mins:120,repeat:'none',days:[],until:'',stepId:'',trackId:'',note:'',done:{},skip:{}};
+  btn(P,'Calendar').click(); await sleep(80);
+  btn(P,'Export .ics').click(); await sleep(50);
+  const ics=await lastBlobText(P);
+  check(ics.includes('DTSTART:'+d.replace(/-/g,'')+'T230000'),'DTSTART missing');
+  check(ics.includes('DTEND:'+plusDays(d,1).replace(/-/g,'')+'T010000'),'DTEND not on the next day:\n'+ics.split('\n').filter(l=>/^DT/.test(l)).join(' '));
+  const blk=[...P.d.querySelectorAll('.blk')].find(e=>/Late study/.test(e.textContent));
+  check(blk,'block not drawn');
+  check(blk.offsetTop+blk.offsetHeight<=blk.parentElement.offsetHeight+1,'block runs past the bottom of the day');
+});
+test('a damaged backup is refused and nothing changes',async()=>{
+  const P=await loadPage();
+  run(P,'mark py1 done'); await sleep(50);
+  const before=JSON.stringify(P.R.state());
+  const bad=new File([JSON.stringify({status:{py1:'todo'},sched:{a:{date:'not a date',start:'x'}},roadmap:{tracks:'oops'}})],'bad.json');
+  const inp=P.d.getElementById('importFile'); const dt=new P.w.DataTransfer(); dt.items.add(bad); inp.files=dt.files;
+  inp.dispatchEvent(new P.w.Event('change')); await sleep(200);
+  check(JSON.stringify(P.R.state())===before,'state changed after a bad import');
+  check(/Import failed/.test(P.d.getElementById('toast').textContent),'no error message: '+P.d.getElementById('toast').textContent);
+});
+test('a good backup round-trips',async()=>{
+  const P=await loadPage();
+  run(P,'mark py1 done'); await sleep(50);
+  P.R.state().sched.y={id:'y',title:'Gym',date:tomorrow(),start:'06:00',mins:60,repeat:'daily',days:[],until:'',stepId:'',trackId:'',note:'',done:{},skip:{}};
+  btn(P,'Export progress').click(); await sleep(50);
+  const txt=await lastBlobText(P);
+  run(P,'reset py1'); await sleep(50);
+  const inp=P.d.getElementById('importFile'); const dt=new P.w.DataTransfer(); dt.items.add(new File([txt],'b.json')); inp.files=dt.files;
+  inp.dispatchEvent(new P.w.Event('change')); await sleep(200);
+  check(P.R.status('py1')==='done','py1 not restored');
+  check(P.R.sched().y&&P.R.sched().y.title==='Gym','calendar block not restored');
+});
+test('Download updated roadmap writes a valid data block',async()=>{
+  const P=await loadPage();
+  run(P,'rename py1 to Python warm-up'); await sleep(50);
+  P.d.getElementById('downloadBtn').click(); await sleep(50);
+  const html=await lastBlobText(P);
+  const a=html.indexOf('/*ROADMAP_START*/')+17, b=html.indexOf('/*ROADMAP_END*/');
+  const data=JSON.parse(html.slice(a,b));
+  check(data.tracks.find(t=>t.id==='py').nodes.find(n=>n.id==='py1').title==='Python warm-up','edit not in the file');
+});
+
+/* ---------- AI assistant (mocked) ---------- */
+test('AI via an OpenAI-compatible API, undone in one step',async()=>{
+  const P=await loadPage(1100,()=>{localStorage.setItem('roadmap-ai-v1',JSON.stringify({provider:'custom',on:true,models:{custom:'mock'},bases:{custom:location.origin+'/v1'},keys:{custom:'k'}}));});
+  const math=()=>P.R.data().tracks.find(t=>t.id==='math').nodes[0].date;
+  const m0=math();
+  run(P,'move math a week later and book dsa'); await until(()=>!P.d.querySelector('.ai-busy')&&/Done:/.test(cmdText(P)));
+  check(math()!==m0,'math not moved'); check(Object.keys(P.R.sched()).length===1,'no block added');
+  check(P.R.data().tracks.find(t=>t.id==='py').nodes.find(n=>n.id==='py2').date!=='2026-12-20','invalid tool call changed data');
+  btn(P,'Undo').click(); await sleep(50);
+  check(math()===m0&&Object.keys(P.R.sched()).length===0,'undo did not reverse the turn');
+});
+test('AI via the Anthropic SDK (needs internet for the SDK)',async()=>{
+  const P=await loadPage(1100,()=>{localStorage.setItem('roadmap-ai-v1',JSON.stringify({provider:'anthropic',on:true,models:{},bases:{},keys:{anthropic:'sk-ant-test'}}));});
+  const real=P.w.fetch.bind(P.w); P.w.fetch=(u,o)=>real(String(u&&u.url||u).replace('https://api.anthropic.com',location.origin),o);
+  run(P,'i finished car1'); await until(()=>!P.d.querySelector('.ai-busy'),20000);
+  check(P.R.status('car1')==='done','car1 not done: '+cmdText(P));
+});
+
+/* ---------- GitHub Gist sync (mocked GitHub API) ---------- */
+function syncCfg(extra){localStorage.setItem(SYNC_KEY,JSON.stringify(Object.assign({token:'test-token',api:GH},extra||{})));}
+test('sync: connecting creates a secret gist and saves progress to it',async()=>{
+  const P=await loadPage(1100,()=>syncCfg());
+  await P.R.syncNow();
+  const cfg=JSON.parse(localStorage.getItem(SYNC_KEY));
+  check(cfg.gist==='g1','gist id not stored: '+cfg.gist);
+  run(P,'mark py1 done'); await sleep(50);
+  await P.R.syncNow();
+  const g=await gist('g1');
+  check(g.state.status.py1==='done','remote status: '+JSON.stringify(g.state.status));
+});
+test('sync: a change made on another device shows up here',async()=>{
+  const P=await loadPage(1100,null,true);
+  const g=await gist('g1'); g.state.status.car1='doing'; g.savedAt=new Date().toISOString(); g.device='other-device';
+  await fetch('/__test/gist/g1',{method:'POST',body:JSON.stringify({content:JSON.stringify(g)})});
+  await P.R.syncNow();
+  check(P.R.status('car1')==='doing','car1: '+P.R.status('car1'));
+});
+test('sync: edited steps travel too, and Download banner is not shown',async()=>{
+  const P=await loadPage(1100,null,true);
+  run(P,'rename bk1 to Linux basics, synced'); await sleep(50);
+  await P.R.syncNow();
+  const g=await gist('g1');
+  check(g.roadmap&&g.roadmap.tracks.find(t=>t.id==='bk').nodes.find(n=>n.id==='bk1').title==='Linux basics, synced','edit not in gist');
+  check(!/Download the updated roadmap/.test(P.d.getElementById('banner').textContent),'download banner still shown with sync on');
+});
+test('sync: a clash asks before overwriting',async()=>{
+  const P=await loadPage(1100,null,true);
+  run(P,'mark bk2 done'); await sleep(50);                       // local change, not yet saved
+  const g=await gist('g1'); g.state.status.deg1='doing'; g.savedAt=new Date(Date.now()+1000).toISOString(); g.device='other-device';
+  await fetch('/__test/gist/g1',{method:'POST',body:JSON.stringify({content:JSON.stringify(g)})});
+  await P.R.syncNow();
+  const ban=P.d.getElementById('banner').textContent;
+  check(/another device/i.test(ban),'no clash banner: '+ban);
+  const g2=await gist('g1'); check(!g2.state.status.bk2,'overwrote the other device without asking');
+  btn(P,'Keep this device\'s copy').click(); await sleep(50); await P.R.syncNow();
+  const g3=await gist('g1'); check(g3.state.status.bk2==='done','local copy not saved after choosing it');
+});
+test('sync: a second device finds the existing gist from the token alone',async()=>{
+  const P=await loadPage(1100,()=>syncCfg());
+  await P.R.syncNow();
+  check(JSON.parse(localStorage.getItem(SYNC_KEY)).gist==='g1','did not find g1');
+  check(P.R.status('bk2')==='done','progress not loaded from the gist');
+});
+test('sync: connecting from the settings box (as a user would)',async()=>{
+  const P=await loadPage(1100,()=>{localStorage.setItem(SYNC_KEY,JSON.stringify({api:GH}));});
+  check(P.d.getElementById('syncBtn').hidden,'sync button visible before connecting');
+  P.d.getElementById('syncSetBtn').click(); await sleep(50);
+  const inp=P.d.querySelector('#cmdOut input[type=password]'); check(inp,'no token field');
+  inp.value='test-token'; btn(P,'Connect').click();
+  await until(()=>/Connected/.test(cmdText(P)));
+  check(/Loaded your roadmap|choose which/.test(cmdText(P)),'unexpected: '+cmdText(P));
+  check(!P.d.getElementById('syncBtn').hidden,'sync button hidden after connecting');
+  check(P.R.status('bk2')==='done','progress not loaded');
+});
+test('keys and tokens never reach exports or the downloaded file',async()=>{
+  const P=await loadPage(1100,()=>{localStorage.setItem('roadmap-ai-v1',JSON.stringify({provider:'anthropic',keys:{anthropic:'sk-ant-secret'}}));},true);
+  btn(P,'Export progress').click(); await sleep(30);
+  const exp=await lastBlobText(P);
+  P.d.getElementById('downloadBtn').click(); await sleep(30);
+  const html=await lastBlobText(P);
+  const g=JSON.stringify(await gist('g1'));
+  [exp,html,g].forEach((t,i)=>check(!t.includes('test-token')&&!t.includes('sk-ant-secret'),'secret found in output '+i));
+});
+test('GitHub Pages: index.html sends visitors to roadmap.html',async()=>{
+  const t=await (await fetch('/index.html')).text();
+  check(/url=roadmap\.html/i.test(t)&&/href="roadmap\.html"/.test(t),'index.html does not point to roadmap.html');
+});
+
+(async()=>{
+  localStorage.clear();
+  for(const t of tests){
+    try{ await t.fn(); results.push({name:t.name,ok:true}); }
+    catch(e){ results.push({name:t.name,ok:false,info:e.message}); }
+  }
+  await fetch('/report',{method:'POST',body:JSON.stringify({results,pageErrors})});
+})();
+</script>
+</body></html>

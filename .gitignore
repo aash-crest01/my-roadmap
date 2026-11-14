@@ -1,0 +1,13 @@
+# Python cache from running dev/run_smoke.py
+__pycache__/
+*.pyc
+
+# Editor and OS clutter
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Progress backups and calendar exports you download into this folder by accident
+roadmap-progress-*.json
+roadmap-schedule.ics
