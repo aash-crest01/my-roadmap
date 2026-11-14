@@ -24,9 +24,11 @@
 
 ## 2a. Daily use
 
-1. Open **This week** to see what is due in the next 7 days and anything overdue.
-2. Tap a step to open it. Tick checklist items as you finish them, or pick a status.
-3. Or just type what you did in the instruction box, for example `solved two sum`.
+1. Open **This week**. At the top are today's booked study sessions, then what is due in the next 7 days and anything overdue.
+2. Click the round tick on a card or timeline step to mark it done in one click. A message appears with **Undo** for a few seconds. Steps with a checklist show a dashed list icon instead: it opens the checklist, because their status follows your ticks.
+3. Or click a step to open it and pick a status, or type what you did in the instruction box, for example `solved two sum`.
+
+Each track tab opens at your first unfinished step (outlined), with a red "Today" line on the timeline. The colour key is on the Overview tab; a grey left border means not started.
 
 "Done" means you can do it again from a blank page without notes. If not, leave it In progress.
 

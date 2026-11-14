@@ -35,6 +35,7 @@ function loadPage(width,setup,keep){
   });
 }
 function run(P,text){P.d.getElementById('cmdInput').value=text;P.d.getElementById('cmdForm').requestSubmit();}
+function tab(P,name){return [...P.d.querySelectorAll('#tabs .tab')].find(b=>b.textContent.trim().startsWith(name));}
 function btn(P,label,scope){return [...(scope||P.d).querySelectorAll('button')].find(b=>b.textContent.trim()===label);}
 async function lastBlobText(P){const b=P.w.__blobs[P.w.__blobs.length-1];return b?await b.text():'';}
 function cmdText(P){return P.d.getElementById('cmdOut').innerText;}
@@ -83,6 +84,50 @@ test('arrow keys move between tabs',async()=>{
   const sel=P.d.querySelector('#tabs [aria-selected="true"]');
   check(/Calendar/.test(sel.textContent),'selected: '+sel.textContent);
   check(P.d.activeElement===sel,'focus did not follow the selected tab');
+});
+
+/* ---------- laptop UX ---------- */
+test('quick tick marks a step done, and the toast Undo reverses it',async()=>{
+  const P=await loadPage();
+  tab(P,'Python').click(); await sleep(80);
+  const q=P.d.querySelector('.qtick[data-id="py1"]'); check(q&&!q.classList.contains('cl'),'no quick tick on py1');
+  q.click(); await sleep(50);
+  check(P.R.status('py1')==='done','py1 not done');
+  check(P.d.querySelector('.qtick[data-id="py1"]').classList.contains('on'),'tick not shown as on');
+  const u=P.d.querySelector('#toast .toast-btn'); check(u&&u.textContent==='Undo','no Undo in the toast');
+  u.click(); await sleep(50);
+  check(P.R.status('py1')==='todo','undo did not reverse the tick');
+});
+test('quick tick on a checklist step opens its checklist',async()=>{
+  const P=await loadPage();
+  tab(P,'DSA').click(); await sleep(80);
+  P.d.querySelector('.qtick.cl').click(); await sleep(80);
+  check(P.d.getElementById('panel').classList.contains('open')&&P.d.querySelector('#panel .cl-head'),'checklist panel not open');
+});
+test('This week shows today\'s study sessions',async()=>{
+  const P=await loadPage();
+  check(/Nothing booked for today/.test(P.d.getElementById('view').textContent),'no empty-state for today');
+  run(P,'schedule py2 today 11:30pm for 30 min'); await sleep(50); btn(P,'Add to calendar').click(); await sleep(50);
+  btn(P,'This week').click(); await sleep(80);
+  const row=P.d.querySelector('#view .today-list .tdl'); check(row&&/11:30pm/.test(row.textContent),'session not listed on This week');
+});
+test('less clutter: legend only on Overview, goal only on summary views, no "Not started" labels',async()=>{
+  const P=await loadPage();
+  tab(P,'DSA').click(); await sleep(80);
+  check(P.d.getElementById('legend').hidden&&P.d.getElementById('goalLine').hidden,'legend/goal shown on a track');
+  check(!/Not started/.test(P.d.querySelector('#view .path').textContent),'"Not started" still shown on steps');
+  btn(P,'Overview').click(); await sleep(80);
+  check(!P.d.getElementById('legend').hidden&&!P.d.getElementById('goalLine').hidden,'legend/goal missing on Overview');
+});
+test('a track opens at the first unfinished step',async()=>{
+  const P=await loadPage(1100);
+  const mains=P.R.data().tracks.find(t=>t.id==='dsa').nodes.filter(n=>n.type!=='branch');
+  mains.slice(0,6).forEach(n=>{P.R.state().status[n.id]='done';});
+  tab(P,'DSA').click(); await sleep(120);
+  const nx=P.d.querySelector('#view .main.is-next .node');
+  check(nx&&nx.getAttribute('data-id')===mains[6].id,'wrong next step: '+(nx&&nx.getAttribute('data-id')));
+  check(P.w.scrollY>200,'page did not scroll to the next step (scrollY '+P.w.scrollY+')');
+  const r=nx.getBoundingClientRect(); check(r.top>0&&r.bottom<P.w.innerHeight,'next step not on screen');
 });
 
 /* ---------- data fixes ---------- */
