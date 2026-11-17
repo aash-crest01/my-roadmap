@@ -7291,6 +7291,7 @@ const AI_SYSTEM=[
 '',
 'How the roadmap works:',
 '- Tracks contain steps. Main steps sit on a timeline in date order. Side steps ("side of X") hang beside one main step of the same track and are optional extras.',
+'- You can create new tracks (add_track fills them with steps in the same call), rename tracks or recolour them (update_track), delete whole tracks (delete_track) and edit the roadmap header (update_roadmap: title, goal and goal date, calendar note, phases).',
 '- A step has an id, title, date (YYYY-MM-DD, its due date), what/why text, actions, links, depends_on ids (shown as "needs N"; nothing is locked), an optional verify tag meaning the date or requirement is an estimate to check, notes, and an optional checklist (LeetCode problems, Khan Academy units).',
 '- Status is todo, doing, done or skipped. A step with a checklist follows its ticks (first tick: doing, all ticked: done) unless a status was set by hand; status "auto" clears a hand-set status. Skipped steps are left out of progress.',
 '- Calendar blocks are study sessions: start date, start time (24h HH:MM), length in minutes, repeat (none, daily, weekdays, or weekly on chosen days) and an optional last date. A block can be linked to a step or just have a title. Single sessions of a repeating block can be skipped or marked done.',
@@ -7300,6 +7301,7 @@ const AI_SYSTEM=[
 '- Resolve names to ids from the overview. Use search for checklist items or when unsure. If a name fits several steps and the choice matters, ask which one instead of guessing.',
 '- Work out exact dates from today\'s date. A date without a year means the next one coming. A time without am/pm from 1 to 6 means pm.',
 '- Do what was asked and nothing more. Leave text, dates and links the user did not mention as they are.',
+'- To plan a whole new area, call add_track once with its name and all its steps; a new step can use side_step_of with another new step\'s title to hang beside it. Use update_roadmap when the user wants the goal, title or phases changed.',
 '- Before deleting more than three steps, or moving many steps in a way the user may not have meant, describe the plan and ask first. Otherwise act without asking: the user can undo your whole turn with one click.',
 '- Never make up links. Add only links the user gives you.',
 '- When you are done, reply in one to four short plain sentences without markdown: what changed, with dates written like "Sat 20 Dec". If you need an answer from the user, ask only that.'
@@ -7330,7 +7332,7 @@ function aiOverview(){
   (META.phases||[]).forEach(function(ph){L.push('Phase "'+ph.name+'": '+ph.from+' to '+ph.to);});
   L.push('','Steps (id | title | date | status | ...):');
   TRACKS.forEach(function(t){
-    L.push('','Track '+t.id+' "'+t.name+'"');
+    L.push('','Track '+t.id+' "'+t.name+'"'+(t.color?' (colour '+t.color+')':'')+(t.blurb?' — '+t.blurb:''));
     (t.nodes||[]).forEach(function(n){L.push(aiStepLine(n,t));});
   });
   const bl=schedAll();
@@ -7384,7 +7386,25 @@ const AI_TOOLS=[
   T('add_block','Schedule a study block (one session or a repeating one).',BLOCK_PROPS,['date','start','minutes']),
   T('update_block','Change a calendar block and all its repeats. Only pass the fields to change.',Object.assign({id:S},BLOCK_PROPS),['id']),
   T('delete_block','Delete a calendar block and all its repeats.',{id:S},['id']),
-  T('session','Act on one session of a block on one date: mark it done or not done, or skip it or bring it back (for repeating blocks).',{block_id:S,date:S,action:{type:'string',enum:['done','undone','skip','unskip']}},['block_id','date','action'])
+  T('session','Act on one session of a block on one date: mark it done or not done, or skip it or bring it back (for repeating blocks).',{block_id:S,date:S,action:{type:'string',enum:['done','undone','skip','unskip']}},['block_id','date','action']),
+  T('add_track','Create a new track and optionally fill it with steps in the same call. Returns the track id and the new step ids.',
+    {name:S,
+     id:{type:'string',description:'Short track id: lowercase letters, numbers and dashes. Optional; made from the name if omitted.'},
+     color:{type:'string',description:'Colour like #3b82f6. Optional.'},
+     blurb:S,
+     steps:{type:'array',items:{type:'object',properties:{
+       title:S,date:{type:'string',description:'YYYY-MM-DD.'},what:S,why:S,actions:SA,
+       links:{type:'array',items:{type:'object',properties:{label:S,url:S},required:['label']}},
+       checklist:{type:'array',items:S,description:'Checklist item labels.'},
+       side_step_of:{type:'string',description:'Title of another step in this same list to hang beside it as a side step.'}},required:['title']},description:'Steps to create inside the new track.'}},
+    ['name']),
+  T('update_track','Change a track\'s name, colour or blurb. Only pass the fields to change.',{track:S,name:S,color:S,blurb:S},['track']),
+  T('delete_track','Delete a whole track. If it still has steps, you must say what happens to them.',
+    {track:S,move_steps_to:{type:'string',description:'Move the steps to this track instead of deleting them.'},delete_steps:{type:'boolean',description:'Delete the steps together with the track.'}},['track']),
+  T('update_roadmap','Change the roadmap header: title, goal, goal date, calendar note or phases. Only pass the fields to change.',
+    {title:S,goal:S,goal_date:{type:'string',description:'YYYY-MM-DD, or "" to clear it.'},goal_verify:{type:'boolean',description:'Marks the goal date as an estimate to verify.'},
+     calendar_note:{type:'string',description:'Or "" to clear it.'},
+     phases:{type:'array',items:{type:'object',properties:{name:S,from:{type:'string',description:'YYYY-MM-DD.'},to:{type:'string',description:'YYYY-MM-DD.'},note:S},required:['name','from','to']},description:'Replaces the whole phase list.'}},[])
 ];
 
 function need(id){ if(!id||!INDEX[id]||!INDEX[id].track) throw new Error('No step with id "'+id+'". Use search.'); return INDEX[id]; }
@@ -7395,6 +7415,27 @@ function needTrack(q){
 }
 function needBlock(id){ const b=state.sched[id]; if(!b) throw new Error('No calendar block "'+id+'".'); return b; }
 function strArr(v,name){ if(!Array.isArray(v)) throw new Error(name+' must be a list'); return v.map(function(x){return String(x).trim();}).filter(Boolean); }
+function needColor(v){
+  const c=String(v).trim(); if(!c) throw new Error('colour cannot be empty');
+  const d=document.createElement('i'); d.style.color=''; d.style.color=c;
+  if(!d.style.color) throw new Error('"'+c+'" is not a colour. Use hex like #3b82f6 or a colour name.');
+  return c;
+}
+function trackSlug(name){
+  let base=name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,20).replace(/-+$/,'');
+  if(!base) base='track';
+  let id=base,i=2; while(TRACKS.some(function(t){return t.id===id;})) id=base+'-'+(i++);
+  return id;
+}
+function pickNewStep(list,q){ // resolve "side of X" among the steps being created in this call
+  const ql=q.toLowerCase();
+  let m=list.filter(function(n){return n.title.toLowerCase()===ql;});
+  if(m.length!==1){
+    if(!m.length) m=list.filter(function(n){return n.title.toLowerCase().indexOf(ql)>-1;});
+    if(m.length!==1) throw new Error(m.length?'side_step_of "'+q+'" matches several new steps; use the full title':'No new step titled "'+q+'"');
+  }
+  return m[0];
+}
 function aiMut(line){ if(!aiPushed){pushHistory(); aiPushed=true;} if(line) aiChanges.push(line); }
 
 function applyStepFields(n,a,trackId){
@@ -7587,6 +7628,101 @@ const AI_IMPL={
     save(); renderAll();
     aiChanges.push({done:'Marked done',undone:'Marked not done',skip:'Skipped',unskip:'Restored'}[a.action]+': "'+blockTitle(b)+'" on '+fmtDM(d));
     return {ok:true};
+  },
+  add_track:function(a){
+    const name=String(a.name||'').trim(); if(!name) throw new Error('name is required');
+    let id=String(a.id||'').trim();
+    if(id){
+      if(!/^[a-z0-9][a-z0-9-]{0,19}$/.test(id)) throw new Error('id must be 1-20 lowercase letters, numbers or dashes');
+      if(TRACKS.some(function(t){return t.id===id;})) throw new Error('track id "'+id+'" is already taken');
+    }
+    const color=a.color!=null?needColor(a.color):null;
+    if(a.steps!=null&&!Array.isArray(a.steps)) throw new Error('steps must be a list');
+    const drafts=[];
+    (a.steps||[]).forEach(function(s){
+      if(!s||typeof s!=='object') throw new Error('every step must be an object');
+      const title=String(s.title||'').trim(); if(!title) throw new Error('every step needs a title');
+      const side=String(s.side_step_of||'').trim();
+      const n={id:'__new__',title:title,what:'',why:'',actions:[],resources:[]};
+      const f=Object.assign({},s); delete f.side_step_of; delete f.track;
+      applyStepFields(n,f,null);                                  // throws before anything changes
+      const cl=f.checklist!=null?strArr(f.checklist,'checklist'):null;
+      drafts.push({n:n,side:side,cl:cl});
+    });
+    aiMut();
+    if(!id) id=trackSlug(name);
+    const t={id:id,name:name,color:color||'#64748b',blurb:String(a.blurb||'').trim(),nodes:[]};
+    TRACKS.push(t);
+    const created=[];
+    drafts.forEach(function(d){
+      const n=d.n; n.id=makeId(t.id,n.title);
+      if(d.side){ n.type='branch'; n.attachTo=pickNewStep(created,d.side).id; }
+      if(d.cl&&d.cl.length) n.checklist=d.cl.map(function(s,i){return {id:'i'+(i+1),label:s};});
+      created.push(n); t.nodes.push(n);
+    });
+    resortTrack(t); commit();
+    aiChanges.push('Created track "'+t.name+'"'+(created.length?' with '+created.length+' step'+(created.length===1?'':'s'):''));
+    return {ok:true,id:t.id,steps:created.map(function(n){return n.id+': '+n.title;})};
+  },
+  update_track:function(a){
+    const t=needTrack(a.track); const draft=clone(t);
+    if(a.name!=null){ const s=String(a.name).trim(); if(!s) throw new Error('name cannot be empty'); draft.name=s; }
+    if(a.color!=null) draft.color=needColor(a.color);
+    if(a.blurb!=null) draft.blurb=String(a.blurb).trim();
+    aiMut();
+    t.name=draft.name; t.color=draft.color; t.blurb=draft.blurb;
+    commit(); aiChanges.push('Updated track "'+t.name+'"');
+    return {ok:true,track:t.id,name:t.name};
+  },
+  delete_track:function(a){
+    const t=needTrack(a.track);
+    if(TRACKS.length===1) throw new Error('This is the only track. Add another one first, or delete single steps instead.');
+    let dest=null;
+    if(a.move_steps_to!=null&&String(a.move_steps_to).trim()!==''){
+      dest=needTrack(a.move_steps_to); if(dest===t) throw new Error('move_steps_to must be a different track');
+    }
+    const nodes=(t.nodes||[]).slice();
+    if(nodes.length&&!dest&&!a.delete_steps) throw new Error('Track "'+t.name+'" has '+nodes.length+' step'+(nodes.length===1?'':'s')+'. Pass move_steps_to or delete_steps:true.');
+    aiMut();
+    if(dest){
+      const ids={}; nodes.forEach(function(n){ids[n.id]=1;});
+      nodes.forEach(function(n){
+        if(n.type==='branch'&&!(n.attachTo&&ids[n.attachTo])){ delete n.type; delete n.attachTo; }
+        insertNode(dest.id,n);
+      });
+      aiChanges.push('Moved '+nodes.length+' step'+(nodes.length===1?'':'s')+' from '+t.name+' to '+dest.name+' and deleted the track');
+    } else if(a.delete_steps){
+      nodes.forEach(function(n){deleteNode(n.id);});
+      aiChanges.push('Deleted track "'+t.name+'" and its '+nodes.length+' step'+(nodes.length===1?'':'s'));
+    } else aiChanges.push('Deleted empty track "'+t.name+'"');
+    TRACKS.splice(TRACKS.indexOf(t),1);
+    TRACKS.forEach(resortTrack); commit();
+    return {ok:true};
+  },
+  update_roadmap:function(a){
+    const draft=clone(META); let touched=0;
+    if(a.title!=null){ const s=String(a.title).trim(); if(!s) throw new Error('title cannot be empty'); draft.title=s; touched++; }
+    if(a.goal!=null){ draft.goal=String(a.goal).trim(); if(!draft.goal) delete draft.goal; touched++; }
+    if(a.goal_date!=null){ if(a.goal_date==='') delete draft.goalDate; else draft.goalDate=needDate(a.goal_date,'goal_date'); touched++; }
+    if(a.goal_verify!=null){ if(a.goal_verify) draft.goalVerify=true; else delete draft.goalVerify; touched++; }
+    if(a.calendar_note!=null){ draft.calendarNote=String(a.calendar_note); if(!draft.calendarNote) delete draft.calendarNote; touched++; }
+    if(a.phases!=null){
+      if(!Array.isArray(a.phases)) throw new Error('phases must be a list');
+      const ph=a.phases.map(function(p){
+        if(!p||typeof p!=='object') throw new Error('each phase needs name, from and to');
+        const name=String(p.name||'').trim(); if(!name) throw new Error('each phase needs a name');
+        const from=needDate(p.from,'phase from'), to=needDate(p.to,'phase to');
+        if(to<from) throw new Error('phase "'+name+'" ends before it starts');
+        const o={name:name,from:from,to:to}; if(p.note!=null&&String(p.note).trim()) o.note=String(p.note); return o;
+      });
+      if(ph.length) draft.phases=ph; else delete draft.phases;
+      touched++;
+    }
+    if(!touched) throw new Error('Pass a field to change');
+    aiMut();
+    Object.keys(META).forEach(function(k){delete META[k];}); Object.assign(META,draft);
+    commit(); aiChanges.push('Updated the roadmap header');
+    return {ok:true,title:META.title||'',phases:(META.phases||[]).length};
   }
 };
 function aiExec(c){

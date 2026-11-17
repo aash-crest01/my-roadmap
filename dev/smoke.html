@@ -286,6 +286,20 @@ test('AI via the Anthropic SDK (needs internet for the SDK)',async()=>{
   run(P,'i finished car1'); await until(()=>!P.d.querySelector('.ai-busy'),20000);
   check(P.R.status('car1')==='done','car1 not done: '+cmdText(P));
 });
+test('AI creates and edits a track and the roadmap header',async()=>{
+  const P=await loadPage(1100,()=>{localStorage.setItem('roadmap-ai-v1',JSON.stringify({provider:'custom',on:true,models:{custom:'mock'},bases:{custom:location.origin+'/v1'},keys:{custom:'k'}}));});
+  const before=JSON.parse(JSON.stringify(P.R.data()));
+  run(P,'make a new track called Languages with two steps and set a new goal'); await until(()=>!P.d.querySelector('.ai-busy')&&/Done:/.test(cmdText(P)));
+  const d=P.R.data();
+  const t=d.tracks.find(t=>t.id==='languages');
+  check(t&&t.name==='Languages & tools'&&t.color==='#22c55e'&&t.blurb==='German practice','track not created/edited');
+  check(t.nodes.length===2&&t.nodes[1].type==='branch'&&t.nodes[1].attachTo===t.nodes[0].id,'side step not attached');
+  check(t.nodes[0].checklist&&t.nodes[0].checklist[0].label==='10 XP','checklist missing');
+  check(d.meta.goal==='Test goal'&&d.meta.goalDate==='2027-01-15'&&d.meta.phases.length===1,'header not updated');
+  btn(P,'Undo').click(); await sleep(50);
+  const after=P.R.data();
+  check(after.tracks.length===before.tracks.length&&!after.tracks.some(t=>t.id==='languages')&&after.meta.goal===before.meta.goal,'undo did not reverse the turn');
+});
 
 /* ---------- GitHub Gist sync (mocked GitHub API) ---------- */
 function syncCfg(extra){localStorage.setItem(SYNC_KEY,JSON.stringify(Object.assign({token:'test-token',api:GH},extra||{})));}

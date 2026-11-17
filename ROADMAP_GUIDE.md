@@ -121,6 +121,9 @@ The instruction box only understands the phrasings in the tables above. The **AI
 - `book 45 min of DSA every weekday at 7am until 20 dec, not on fridays`
 - `I finished all the easy array problems`
 - `add a step after the SQL course to learn dbt, with three actions`
+- `create a new track called Languages and fill it with two steps starting in jan`
+- `rename the py track to "Python and ML" and make it green`
+- `change the goal date to 15 aug 2027 and add a phase for the final year`
 - `what is due in the next two weeks?`
 
 **Setting it up.** Click **AI** (or **AI assistant settings** at the bottom of the page, or type `ai settings`). Pick a provider, enter the model name and paste your API key, then Save.
@@ -142,6 +145,7 @@ The model needs to support tool (function) calling. Some providers refuse reques
 - Follow-ups remember the conversation (`now do the same for math`). Type `new chat` to start fresh. The conversation is forgotten when you reload.
 - **Stop** in the working box cancels a request. Changes made before you stopped stay, and Undo still works.
 - Changes to steps work like the Edit form: saved in this browser until you click Download updated roadmap (section 5).
+- Tracks and the roadmap header can be edited too: it can create a track with all its steps in one go, rename or recolour tracks, delete tracks, and change the title, goal, goal date, calendar note and phases. Deleting a track that still has steps needs you to say whether to move them to another track or delete them, and it refuses to delete the last track.
 
 **Privacy and cost.** Keys are stored only in this browser (localStorage), one per provider. They are not written into `roadmap.html`, Download updated roadmap or Export progress. Each instruction sends your words, today's date and a short overview of your steps and calendar blocks (titles, dates, status) to the provider. Your provider bills each instruction from your API credit. The overview makes each request several thousand tokens, and an instruction that changes many things takes several requests. **Forget this key** in settings removes a key. If the page is on GitHub Pages, the key is kept separately for that address, as with your progress.
 

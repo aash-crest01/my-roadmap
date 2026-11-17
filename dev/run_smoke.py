@@ -26,6 +26,22 @@ def now_iso():
 
 # ---------- scripted model replies ----------
 def openai_reply(body):
+    first = next((str(m.get("content") or "") for m in body["messages"] if m["role"] == "user"), "")
+    if "make a new track" in first:
+        if not [m for m in body["messages"] if m["role"] == "tool"]:
+            calls = [
+                ("c1", "add_track", {"name": "Languages", "color": "#22c55e", "blurb": "German practice",
+                                     "steps": [
+                                         {"title": "Duolingo warm-up", "date": "2026-12-01", "checklist": ["10 XP"]},
+                                         {"title": "Anki deck", "side_step_of": "Duolingo warm-up"}]}),
+                ("c2", "update_track", {"track": "languages", "name": "Languages & tools"}),
+                ("c3", "update_roadmap", {"goal": "Test goal", "goal_date": "2027-01-15",
+                                          "phases": [{"name": "P1", "from": "2026-11-01", "to": "2027-02-14"}]}),
+            ]
+            msg = {"role": "assistant", "content": None, "tool_calls": [
+                {"id": i, "type": "function", "function": {"name": n, "arguments": json.dumps(a)}} for i, n, a in calls]}
+            return {"model": body["model"], "choices": [{"finish_reason": "tool_calls", "message": msg}]}
+        return {"model": body["model"], "choices": [{"finish_reason": "stop", "message": {"role": "assistant", "content": "Done: made the Languages track and set the goal."}}]}
     tool_msgs = [m for m in body["messages"] if m["role"] == "tool"]
     if not tool_msgs:
         calls = [
